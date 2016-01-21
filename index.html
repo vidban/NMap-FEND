@@ -23,6 +23,7 @@
 	    cursor: pointer;
 	    padding: 3px 4px 3px;
 		display:none;
+		cursor: pointer;
 	}
 
 	#hamburger div {
@@ -55,9 +56,16 @@
 
 /* Table and search menu on the left */
 	.menu {
-		position: absolute;
+		/*position: absolute;*/
+		float: left;
 		width: 300px;
 		background-color: #696969;
+
+		-webkit-transition: 0.5s;
+	    -moz-transition: 0.5s;
+	    -ms-transition: 0.5s;
+ 	    -o-transition: 0.5s;
+ 	    transition: 0.5s;
 	}
 
 	.srch {
@@ -105,7 +113,13 @@
 
 	.main {
 		width: calc(100% - 300px);
-		margin-left: 300px;
+		float: right;
+	
+		-webkit-transition: 0.5s;
+	    -moz-transition: 0.5s;
+	    -ms-transition: 0.5s;
+ 	    -o-transition: 0.5s;
+ 	    transition: 0.5s;
 	}
 
 	#map{
@@ -117,7 +131,7 @@
         max-width: 200px;
     }
 
-    @media screen and (max-width: 414px){
+    @media screen and (max-width: 600px){
     	header {
     		position: relative;
     		height: 80px;
@@ -129,12 +143,32 @@
 		 	width: 50px;
 		 	margin: 15px;
 		 }
+		 .closed {
+		 	margin-left: -300px;
+		 }
+
+		 .open{
+			margin-left: 0px;
+		 }
+
+		 .showmap {
+		 	width: 100%;
+		 }
+
+ 		 .hidemap {
+			width: calc(100% - 300px);
+		 }
+
+		 #infowindow {
+			max-width: 300px
+		 }
+
     }
 	</style>
 </head>
 <body>
 	<header>
-		<div id="hamburger">
+		<div id="hamburger" onclick="toggleMenu()">
 			<div></div>
 			<div></div>
 			<div></div>
@@ -142,7 +176,7 @@
 		<h1>Restaurants around Mountain View, CA</strong></h1>
 	</header>
 	<div class="container">
-	<div class="menu">
+	<div class="menu closed">
 		<div class="srch"><img src="search-icon-md.png"><input type="text" placeholder="  Choose a place" data-bind="value: filter, valueUpdate: 'afterkeydown'"></div>
 		<table>
 			<tbody data-bind="template: {name: 'list', foreach: filteredItems}">
@@ -155,7 +189,7 @@
 			</script>
 		</table>
 	</div>
-	<div  class="main">
+	<div  class="main showmap">
 		<div class="mapcanvas" id="map"></div>	
 	</div>	
 	</div>
@@ -315,6 +349,18 @@ function loadYelp(pname,paddress){
   });
 
 };
+
+function toggleMenu(){
+	console.log('clicked');
+	if ($(".menu").hasClass("open")){
+		$(".menu").removeClass("open").addClass("closed");
+		$(".main").removeClass("hidemap").addClass("showmap");
+
+	}else {
+		$(".menu").removeClass("closed").addClass("open");
+		$(".main").removeClass("showmap").addClass("hidemap");
+	}
+}
 
 
 var placeViewModel = {
