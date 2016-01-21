@@ -16,31 +16,29 @@
 		background-color: #696969;
 		display: flex;
 	}
-	#hamburger {
+	.hamburger {
 		border: 1px solid #374C77;
 	    border-radius: 3px 3px 3px 3px;
 	    background-color: green;
 	    cursor: pointer;
 	    padding: 3px 4px 3px;
 		display:none;
-		cursor: pointer;
 	}
 
-	#hamburger div {
+	.hamburger div {
 		background-color: #fff;
-		border: 1px solid #eee;
-		border-radius: 2px 2px 2px 2px;
+*/		border-radius: 2px 2px 2px 2px;
 		height: 2px;
 		width: 90%;
 		margin: auto;
 		margin-bottom: 5px
 	}
 
-	#hamburger div:first-child{
+	.hamburger div:first-child{
 		margin-top: 8px;
 	}
 
-	header h1 {
+	h1 {
 		padding: 0;
 		margin: 0;
 		width: 100%;
@@ -56,7 +54,6 @@
 
 /* Table and search menu on the left */
 	.menu {
-		/*position: absolute;*/
 		float: left;
 		width: 300px;
 		background-color: #696969;
@@ -76,9 +73,8 @@
 
 	input {
 		background: #fcfcfc;
-		border: 1px solid #aaa;
 		border-radius: 5px;
-		width: calc(100% - 22px);
+		width: calc(100% - 24px);
 		height: 20px;
 	}
 
@@ -122,7 +118,7 @@
  	    transition: 0.5s;
 	}
 
-	#map{
+	.mapcanvas{
 		width: 100%;
 		height: 100vh;
 	}
@@ -136,7 +132,7 @@
     		position: relative;
     		height: 80px;
     	}
-		 #hamburger {
+		 .hamburger {
 		 	position: relative;
 		 	display: block;
 		 	height: 50%;
@@ -148,7 +144,7 @@
 		 }
 
 		 .open{
-			margin-left: 0px;
+			margin-left: 0;
 		 }
 
 		 .showmap {
@@ -168,7 +164,7 @@
 </head>
 <body>
 	<header>
-		<div id="hamburger" onclick="toggleMenu()">
+		<div class="hamburger" onclick="toggleMenu()">
 			<div></div>
 			<div></div>
 			<div></div>
@@ -198,8 +194,6 @@
 <script src = "jquery-1.10.2.js"></script>
 <script type="text/javascript" src="http://oauth.googlecode.com/svn/code/javascript/oauth.js"></script>
 <script type="text/javascript" src="http://oauth.googlecode.com/svn/code/javascript/sha1.js"></script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBUxuLeByYwf76lHdvL2QUXTMj7VJwrTMM&libraries=places&callback=initialize"
-        async defer></script>
 <script>
 
 
@@ -210,10 +204,31 @@ var MARKER_PATH = 'https://maps.gstatic.com/intl/en_us/mapfiles/marker_green';
 var marker = ko.observableArray();
 var currentMarker = '';
 
+// check whether user is online and load Google Maps otherwise alert
+function loadScript(){
+	if (!navigator.onLine){
+		alert("You are currently offline. Please check your connection");
+		return;
+	}else {
+		var script = document.createElement('script');
+		script.type = "text/javascript";
+		document.getElementsByTagName('body')[0].appendChild(script);
+		script.src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBUxuLeByYwf76lHdvL2QUXTMj7VJwrTMM&libraries=places&callback=initialize";
+	}
+}
+
+window.onload = loadScript();
+
 
 // create a map and setup markers for desired establishment
 
 function initialize() {
+
+	if (typeof(google.maps) !== 'object'){
+		console.log("here");
+		$(".main").html("Error loading map! Please check your console");
+	}
+
 	var loc = new google.maps.LatLng(37.383977, -122.081295);
 
 	map = new google.maps.Map(document.getElementById('map'), {
@@ -236,6 +251,8 @@ function callback(results, status) {
     	for (var i = 0; i < results.length; i++) {
       		createMarker(results[i], i);
 	    }
+	} else {
+		alert(status);
 	}	
 }
 
@@ -254,7 +271,6 @@ function createMarker(place, i) {
 	});
 
 	google.maps.event.addListener(marker[i], 'click', function() {
-
 		map.panTo(this.position);
 		service.getDetails({placeId: place.place_id}, function(place, status){
 			if (status !== google.maps.places.PlacesServiceStatus.OK) {
@@ -265,7 +281,7 @@ function createMarker(place, i) {
 		infowindow.open(map, this);
 
 	    // add bounce feature to marker upon click and stop earlier marker from bouncing
-		if (currentMarker!='') currentMarker.setAnimation(null);
+		if (currentMarker!=='') currentMarker.setAnimation(null);
 		currentMarker= this;
 		this.setAnimation(google.maps.Animation.BOUNCE);
 	});
@@ -287,7 +303,7 @@ function loadYelp(pname,paddress){
 
   /*variables to check whether address on google maps matches yelp address */
 
-  var ind = paddress.indexOf(',');
+  // var ind = paddress.indexOf(',');
   var placeAddress = paddress.slice(0,3);
   /*Variable for OAuth Authentication. */
   var auth = {
@@ -348,7 +364,7 @@ function loadYelp(pname,paddress){
 
   });
 
-};
+}
 
 function toggleMenu(){
 	console.log('clicked');
@@ -384,10 +400,10 @@ placeViewModel.filteredItems = ko.computed(function() {
 			}
 			return this.names();
 		} else {
-			pinresult = ko.utils.arrayFilter(this.markers(), function(pin) {
+			ko.utils.arrayFilter(this.markers(), function(pin) {
 				var matches = pin.name.toLowerCase().indexOf(filter) >= 0;
 				pin.setVisible(matches);
-			})
+			});
 			return ko.utils.arrayFilter(this.names(), function(item) {
 				return item.name.toLowerCase().indexOf(filter) !== -1;
 			});
@@ -396,6 +412,11 @@ placeViewModel.filteredItems = ko.computed(function() {
 
 // triggers click for associated marker on menu click
 placeViewModel.selectedPin = ko.computed(function() {
+	if (screen.width <= 600) {
+		$(".menu").removeClass("open").addClass("closed");
+		$(".main").removeClass("hidemap").addClass("showmap");
+	}
+
 	var filteredPin = this.filteredPin();
 	for (var k in this.markers()){
 		if (this.markers()[k].name === filteredPin){
