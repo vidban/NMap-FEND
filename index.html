@@ -52,7 +52,7 @@
 			<tbody data-bind="template: {name: 'list', foreach: filteredItems}">
 			</tbody>
 			<script id="list" type="text/html">
-				<tr class="listview" data-bind="css: {'selected': num === $parent.currentSelected()}, click: function() { $parent.selectItem($parent, $data);}">
+				<tr class="listview" data-bind="css: {'selected': num === $parent.currentSelected()}, click: function() { $parent.selectItem($parent, $data); $parent.filteredPin();}">
 					<td><img data-bind="attr: {src: iconimage}"></td>
 					<td data-bind="text: name"></td>
 				</tr>
@@ -75,14 +75,14 @@ var MARKER_PATH = 'https://maps.gstatic.com/intl/en_us/mapfiles/marker_green';
 var marker = ko.observableArray();
 
 
-// create a map and setup markers for desired group
+// create a map and setup markers for desired establishment
 
 function initialize() {
 	var loc = new google.maps.LatLng(37.383977, -122.081295);
 
 	map = new google.maps.Map(document.getElementById('map'), {
 		center: loc,
-		zoom: 14
+		zoom: 15
 	});
 
 	infowindow = new google.maps.InfoWindow();
@@ -100,7 +100,6 @@ function callback(results, status) {
     	for (var i = 0; i < results.length; i++) {
       		createMarker(results[i], i);
 	    }
-	    console.log(marker());
 	}	
 }
 
@@ -120,11 +119,11 @@ function createMarker(place, i) {
 
 	google.maps.event.addListener(marker[i], 'click', function() {
 		map.panTo(this.position);
-	    infowindow.setContent(place.name);
+	    infowindow.setContent(markerLabel);
 	    infowindow.open(map, this);
 	});
 
-	// populate an array with results of google placesearch
+	// populate arrays with results of google placesearch
    	placeArray.push({"num": i,"name": place.name, "iconimage":markerIcon, "placeResult":place}); 
    	marker.push(marker[i]);	
 
@@ -136,12 +135,13 @@ var placeViewModel = {
 	currentSelected: ko.observable(),
 	selectItem: function(that, ind){
 		that.currentSelected(ind.num);
+		that.filteredPin(ind.name);
 	},
 	filter: ko.observable(""),
-	filterPins: ko.observable("")
+	filteredPin: ko.observable("")
 };
 
-
+// filters list and markers based on search
 placeViewModel.filteredItems = ko.computed(function() {
 		var filter = this.filter().toLowerCase();
 		if (!filter){
@@ -158,6 +158,16 @@ placeViewModel.filteredItems = ko.computed(function() {
 				return item.name.toLowerCase().indexOf(filter) !== -1;
 			});
 		}
+}, placeViewModel);
+
+// triggers click for associated marker on menu click
+placeViewModel.selectedPin = ko.computed(function() {
+	var filteredPin = this.filteredPin();
+	for (var k in this.markers()){
+		if (this.markers()[k].name === filteredPin){
+			google.maps.event.trigger(this.markers()[k], 'click');
+		}
+	}
 }, placeViewModel);
 
 ko.applyBindings(placeViewModel);
