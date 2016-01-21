@@ -42,6 +42,9 @@
 		width: 100vw;
 		height: 100vw;
 	}
+	#infowindow {
+        max-width: 200px;
+    }
 
 	</style>
 </head>
@@ -63,6 +66,8 @@
 </body>
 <script src= "knockout-3.4.0.js"></script>
 <script src = "jquery-1.10.2.js"></script>
+<script type="text/javascript" src="http://oauth.googlecode.com/svn/code/javascript/oauth.js"></script>
+<script type="text/javascript" src="http://oauth.googlecode.com/svn/code/javascript/sha1.js"></script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBUxuLeByYwf76lHdvL2QUXTMj7VJwrTMM&libraries=places&callback=initialize"
         async defer></script>
 <script>
@@ -120,13 +125,14 @@ function createMarker(place, i) {
 
 	google.maps.event.addListener(marker[i], 'click', function() {
 		map.panTo(this.position);
-		service.getDetails({placeId: place.place_id}, function(place, status){
-			if (status !== google.maps.places.PlacesServiceStatus.OK) {
-				return;
-			}
-			var contentStr = '<div><strong>' + place.name + '</strong><br><p>' + place.formatted_address + '<br>' + place.formatted_phone_number + '</p></div>';
-			infowindow.setContent(contentStr);
-		});
+		// service.getDetails({placeId: place.place_id}, function(place, status){
+		// 	if (status !== google.maps.places.PlacesServiceStatus.OK) {
+		// 		return;
+		// 	}
+		// 	var contentStr = '<div><strong>' + place.name + '</strong><br><p>' + place.formatted_address + '<br>' + place.formatted_phone_number + '</p></div>';
+		// 	infowindow.setContent(contentStr);
+		// });
+		loadYelp(place.name);
 		infowindow.open(map, this);
 
 	    // add bounce feature to marker upon click
@@ -147,6 +153,76 @@ function createMarker(place, i) {
    	marker.push(marker[i]);	
 
 }
+
+function loadYelp(pname){
+  var placeName = pname;
+  /*Variable for OAuth Authentication. */
+  var auth = {
+      consumerKey: "rb0_f_10ZvwVLb-ouicNzQ",
+      consumerSecret: "rppLm7P8oempuQYXa4AiS9ij26Y",
+      accessToken: "VZp-IvJfl6hGPyU93vX-Il-oVIR3U72e",
+      accessTokenSecret: "YpfDA6iodkeNOIaAlympNA-ntHU",
+      serviceProvider : {signatureMethod : "HMAC-SHA1"}
+      };
+
+  var accessor = {
+      consumerSecret : auth.consumerSecret,
+      tokenSecret : auth.accessTokenSecret
+      };
+  /*Terms to search */
+  var terms = placeName.replace(' ','+');
+  var near = 'Mountain+View';
+  var parameters = [];
+
+  parameters.push(['term', terms]);
+  parameters.push(['location', near]);
+  parameters.push(['limit', 1]);
+  parameters.push(['callback', 'cb']);
+  parameters.push(['oauth_consumer_key', auth.consumerKey]);
+  parameters.push(['oauth_consumer_secret', auth.consumerSecret]);
+  parameters.push(['oauth_token', auth.accessToken]);
+  parameters.push(['oauth_signature_method', 'HMAC-SHA1']);
+
+  var message = {
+      'action' : 'http://api.yelp.com/v2/search',
+      'method' : 'GET',
+      'parameters' : parameters
+      };
+
+  OAuth.setTimestampAndNonce(message);
+  OAuth.SignatureMethod.sign(message, accessor);
+
+  var parameterMap = OAuth.getParameterMap(message.parameters);
+
+  $.ajax({
+    'cache': true,
+    'url' : message.action,
+    'data' : parameterMap,
+    'dataType' : 'jsonp',
+    'jsonpCallback' : 'cb',
+    'success' : function(data, textStats, XMLHttpRequest) {
+                    var result = data.businesses[0];
+                    var windowContent ='';
+
+                    // data.businesses.forEach( function(result) {
+                        // if(result.display_phone === undefined) result.display_phone ='';
+                    windowContent += '<div id="infowindow"><img src="yelp_powered_btn_red.png"><br><img id= "bimage" src= "' + result.image_url + '"><br><strong>' + result.name + '</strong><div>' + result.location.display_address.toString() + '</div><div>' + result.display_phone + '</div><br><img src="' + result.rating_img_url_small + '" alt="rating"> (' + result.rating + ')<br><div>Number of Reviews:' + result.review_count + '</div><br><div>' + result.snippet_text + '</div><a href= "' + result.url + '">...Read More</div>';
+                    // });
+                    // $( "#yelpWindow" ).html(windowContent);
+                    // $( "#yelpWindow" ).draggable();
+                    // $( "#yelpWindow" ).dialog({autoOpen: false, title: data.businesses[0].name});
+
+                    // $( "#yelpWindow" ).dialog( "open" );
+                    infowindow.setContent(windowContent);
+                },
+    'error' : function(XMLHttpRequest, textStats, errorThrown) {
+      alert('Error: Problem connecting to Yelp.');
+    }
+
+  });
+
+};
+
 
 var placeViewModel = {
 	names: placeArray,
