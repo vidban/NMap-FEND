@@ -15,18 +15,16 @@
 	table {
 		margin-top: 5px;
 		border: 2px solid black;
-	}
-	th {
-		padding: 20px;
-		border: 1px solid black;
+		z-index: 1;
 	}
 
 	.listview {
-		height: 30px;
+		height: 40px;
 		background-color: #cccccc;
 		text-align: center;
 		vertical-align: middle;
 		display: block;
+		cursor: pointer;
 	}
 
 	.selected {
@@ -37,10 +35,9 @@
 	.listview:hover {
 		background-color: #e6e6e6;
 	}
-
-
 	#map {
 		position: absolute;
+		margin-left: -260px;
 		margin-top: 5px;
 		width: 100vw;
 		height: 100vw;
@@ -52,18 +49,17 @@
 	<div id="container">
 		<input type="text" placeholder="  Choose a place" data-bind="value: filter, valueUpdate: 'afterkeydown'">
 		<table>
-			<tr>
-				<th>Places</th>
-			</tr>
 			<tbody data-bind="template: {name: 'list', foreach: filteredItems}">
 			</tbody>
 			<script id="list" type="text/html">
-				<td class="listview" data-bind="text: name, css: {'selected': num === $parent.currentSelected()}, click: function() { $parent.selectItem($parent, $data);}"></td>
+				<tr class="listview" data-bind="css: {'selected': num === $parent.currentSelected()}, click: function() { $parent.selectItem($parent, $data);}">
+					<td><img data-bind="attr: {src: iconimage}"></td>
+					<td data-bind="text: name"></td>
+				</tr>
 			</script>
 		</table>
 		<div id="map"></div>		
 	</div>
-	
 </body>
 <script src= "knockout-3.4.0.js"></script>
 <script src = "jquery-1.10.2.js"></script>
@@ -75,7 +71,7 @@
 var map, infowindow;
 var placeArray = ko.observableArray();
 var MARKER_PATH = 'https://maps.gstatic.com/intl/en_us/mapfiles/marker_green';
-var marker = [];
+var marker = ko.observableArray();
 
 
 // create a map and setup markers for desired group
@@ -102,16 +98,15 @@ function callback(results, status) {
 	if (status === google.maps.places.PlacesServiceStatus.OK) {
     	for (var i = 0; i < results.length; i++) {
       		createMarker(results[i], i);
-      		createPlaceNameArray(results[i], i);
+      		// createPlaceNameArray(results[i], i);
 	    }
 	}	
-
 }
 
-// populate an array with results of google placesearch
-function createPlaceNameArray(place, i){
-   	placeArray.push({"num": i,"name": place.name});
-}
+// // populate an array with results of google placesearch
+// function createPlaceNameArray(place, i){
+//    	placeArray.push({"num": i,"name": place.name});
+// }
 
 
 function createMarker(place, i) {
@@ -125,15 +120,21 @@ function createMarker(place, i) {
 	    icon: markerIcon
 	});
 
-	marker[i].placeResult = place;
+
+//	marker[i].placeResult = place;
 	google.maps.event.addListener(marker[i], 'click', function() {
+		map.panTo(this.position);
 	    infowindow.setContent(place.name);
 	    infowindow.open(map, this);
 	});
+
+	// populate an array with results of google placesearch
+   	placeArray.push({"num": i,"name": place.name, "iconimage":markerIcon, "markertag": marker[i]});
 }
 
 var placeViewModel = {
 	names: placeArray,
+	markers: marker,
 	currentSelected: ko.observable(),
 	selectItem: function(that, ind){
 		that.currentSelected(ind.num);
@@ -151,6 +152,7 @@ placeViewModel.filteredItems = ko.dependentObservable(function() {
 			});
 		}
 }, placeViewModel);
+
 
 ko.applyBindings(placeViewModel);
 	
