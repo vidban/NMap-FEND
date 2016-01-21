@@ -2,25 +2,41 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>Document</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<title>Neighborhood Map</title>
 	<style>
-	#container {
+	html, body {
+		margin: 0;
+		padding: 0;
+		height: 100%;
+		overflow: hidden;
+	}
+	.header {
+		font-size: 5vw;
+		text-align: center;
+		background-color: #696969;
+	}
+	.container{
+		padding: 0;
+		margin-top: 5px;
 		display: flex;
 		flex-wrap: wrap;
 	}
-	input {
-		width: 100vw;
-		height: 20px;
+
+/* Table menu on the left */
+	.menu {
+		position: absolute;
+		width: 300px;
+		background-color: #696969;
 	}
+
 	table {
-		margin-top: 5px;
-		border: 2px solid black;
-		z-index: 1;
+		height: 100vw;
 	}
 
 	.listview {
 		height: 40px;
-		background-color: #cccccc;
 		text-align: center;
 		vertical-align: middle;
 		display: block;
@@ -33,15 +49,28 @@
 	}
 
 	.listview:hover {
-		background-color: #e6e6e6;
+		background-color: #b3b3b3;
 	}
-	#map {
-		position: absolute;
-		margin-left: -260px;
-		margin-top: 5px;
-		width: 100vw;
-		height: 100vw;
+
+/*   Map and search bar */
+
+	.main {
+		width: calc(100% - 300px);
+		margin-left: 300px;
+		margin right: 0px;
+		padding: 0;
 	}
+
+	input {
+		width: 90%;
+		height: 20px;
+	}
+
+	#map{
+		width: 100%;
+		height: 100vh;
+	}
+
 	#infowindow {
         max-width: 200px;
     }
@@ -49,8 +78,9 @@
 	</style>
 </head>
 <body>
-	<div id="container">
-		<input type="text" placeholder="  Choose a place" data-bind="value: filter, valueUpdate: 'afterkeydown'">
+	<div class="header"><strong>Restaurants around Mountain View, CA</strong></div>
+	<div class="container">
+	<div class="menu">
 		<table>
 			<tbody data-bind="template: {name: 'list', foreach: filteredItems}">
 			</tbody>
@@ -61,7 +91,11 @@
 				</tr>
 			</script>
 		</table>
-		<div id="map"></div>		
+	</div>
+	<div  class="main">
+		<input type="text" placeholder="  Choose a place" data-bind="value: filter, valueUpdate: 'afterkeydown'">
+		<div class="mapcanvas" id="map"></div>	
+	</div>	
 	</div>
 </body>
 <script src= "knockout-3.4.0.js"></script>
@@ -121,7 +155,6 @@ function createMarker(place, i) {
 	    icon: markerIcon,
 	    visible: false,
 	    name: markerLabel,
-	    // placeResult: place
 	});
 
 	google.maps.event.addListener(marker[i], 'click', function() {
@@ -131,9 +164,6 @@ function createMarker(place, i) {
 			if (status !== google.maps.places.PlacesServiceStatus.OK) {
 				return;
 			}
-		// 	var contentStr = '<div><strong>' + place.name + '</strong><br><p>' + place.formatted_address + '<br>' + place.formatted_phone_number + '</p></div>';
-		// 	infowindow.setContent(contentStr);
-		// });
 		loadYelp(place.name,place.formatted_address);
 		});
 		infowindow.open(map, this);
