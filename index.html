@@ -74,6 +74,9 @@
 
 var map, infowindow;
 var placeArray = ko.observableArray();
+var MARKER_PATH = 'https://maps.gstatic.com/intl/en_us/mapfiles/marker_green';
+var marker = [];
+
 
 // create a map and setup markers for desired group
 
@@ -98,8 +101,8 @@ function initialize() {
 function callback(results, status) {
 	if (status === google.maps.places.PlacesServiceStatus.OK) {
     	for (var i = 0; i < results.length; i++) {
-      	createMarker(results[i]);
-      	createPlaceNameArray(results[i], i);
+      		createMarker(results[i], i);
+      		createPlaceNameArray(results[i], i);
 	    }
 	}	
 
@@ -111,18 +114,22 @@ function createPlaceNameArray(place, i){
 }
 
 
-function createMarker(place) {
-  var marker = new google.maps.Marker({
-    map: map,
-    position: place.geometry.location
-  });
+function createMarker(place, i) {
+	var markerLetter = String.fromCharCode('A'.charCodeAt(0) + i);
+   	var markerIcon = MARKER_PATH + markerLetter + '.png';
 
-  google.maps.event.addListener(marker, 'click', function() {
-    infowindow.setContent(place.name);
-    infowindow.open(map, this);
-  });
+	marker[i] = new google.maps.Marker({
+		map: map,
+	    position: place.geometry.location,
+	    animation: google.maps.Animation.DROP,
+	    icon: markerIcon
+	});
 
-
+	marker[i].placeResult = place;
+	google.maps.event.addListener(marker[i], 'click', function() {
+	    infowindow.setContent(place.name);
+	    infowindow.open(map, this);
+	});
 }
 
 var placeViewModel = {
