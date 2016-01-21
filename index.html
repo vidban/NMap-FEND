@@ -68,7 +68,8 @@
 <script>
 
 
-var map, infowindow;
+var map = ko.observable();
+var infowindow;
 var placeArray = ko.observableArray();
 var MARKER_PATH = 'https://maps.gstatic.com/intl/en_us/mapfiles/marker_green';
 var marker = ko.observableArray();
@@ -98,30 +99,25 @@ function callback(results, status) {
 	if (status === google.maps.places.PlacesServiceStatus.OK) {
     	for (var i = 0; i < results.length; i++) {
       		createMarker(results[i], i);
-      		// createPlaceNameArray(results[i], i);
 	    }
+	    console.log(marker());
 	}	
 }
-
-// // populate an array with results of google placesearch
-// function createPlaceNameArray(place, i){
-//    	placeArray.push({"num": i,"name": place.name});
-// }
-
 
 function createMarker(place, i) {
 	var markerLetter = String.fromCharCode('A'.charCodeAt(0) + i);
    	var markerIcon = MARKER_PATH + markerLetter + '.png';
+   	var markerLabel = place.name;
 
 	marker[i] = new google.maps.Marker({
 		map: map,
 	    position: place.geometry.location,
 	    animation: google.maps.Animation.DROP,
-	    icon: markerIcon
+	    icon: markerIcon,
+	    visible: false,
+	    name: markerLabel
 	});
 
-
-//	marker[i].placeResult = place;
 	google.maps.event.addListener(marker[i], 'click', function() {
 		map.panTo(this.position);
 	    infowindow.setContent(place.name);
@@ -129,7 +125,9 @@ function createMarker(place, i) {
 	});
 
 	// populate an array with results of google placesearch
-   	placeArray.push({"num": i,"name": place.name, "iconimage":markerIcon, "markertag": marker[i]});
+   	placeArray.push({"num": i,"name": place.name, "iconimage":markerIcon, "placeResult":place}); 
+   	marker.push(marker[i]);	
+
 }
 
 var placeViewModel = {
@@ -139,20 +137,28 @@ var placeViewModel = {
 	selectItem: function(that, ind){
 		that.currentSelected(ind.num);
 	},
-	filter: ko.observable("")
+	filter: ko.observable(""),
+	filterPins: ko.observable("")
 };
 
-placeViewModel.filteredItems = ko.dependentObservable(function() {
+
+placeViewModel.filteredItems = ko.computed(function() {
 		var filter = this.filter().toLowerCase();
 		if (!filter){
+			for (var k in this.markers()){
+				this.markers()[k].visible = true;
+			}
 			return this.names();
 		} else {
+			pinresult = ko.utils.arrayFilter(this.markers(), function(pin) {
+				var matches = pin.name.toLowerCase().indexOf(filter) >= 0;
+				pin.setVisible(matches);
+			})
 			return ko.utils.arrayFilter(this.names(), function(item) {
 				return item.name.toLowerCase().indexOf(filter) !== -1;
 			});
 		}
 }, placeViewModel);
-
 
 ko.applyBindings(placeViewModel);
 	
