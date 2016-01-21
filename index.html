@@ -24,11 +24,31 @@
 		flex-wrap: wrap;
 	}
 
-/* Table menu on the left */
+/* Table and search menu on the left */
 	.menu {
 		position: absolute;
 		width: 300px;
 		background-color: #696969;
+	}
+
+	.srch {
+		position: relative;
+		background-color: black;
+		margin: auto;
+	}
+
+	input {
+		background: #fcfcfc;
+		border: 1px solid #aaa;
+		border-radius: 5px;
+		width: calc(100% - 22px);
+		height: 20px;
+	}
+
+	.srch img {
+		width: 20px;
+		height: 22px;
+		vertical-align: middle;
 	}
 
 	table {
@@ -52,18 +72,11 @@
 		background-color: #b3b3b3;
 	}
 
-/*   Map and search bar */
+/*   Map */
 
 	.main {
 		width: calc(100% - 300px);
 		margin-left: 300px;
-		margin right: 0px;
-		padding: 0;
-	}
-
-	input {
-		width: 90%;
-		height: 20px;
 	}
 
 	#map{
@@ -81,6 +94,7 @@
 	<div class="header"><strong>Restaurants around Mountain View, CA</strong></div>
 	<div class="container">
 	<div class="menu">
+		<div class="srch"><img src="search-icon-md.png"><input type="text" placeholder="  Choose a place" data-bind="value: filter, valueUpdate: 'afterkeydown'"></div>
 		<table>
 			<tbody data-bind="template: {name: 'list', foreach: filteredItems}">
 			</tbody>
@@ -93,7 +107,6 @@
 		</table>
 	</div>
 	<div  class="main">
-		<input type="text" placeholder="  Choose a place" data-bind="value: filter, valueUpdate: 'afterkeydown'">
 		<div class="mapcanvas" id="map"></div>	
 	</div>	
 	</div>
@@ -271,6 +284,7 @@ var placeViewModel = {
 placeViewModel.filteredItems = ko.computed(function() {
 		var filter = this.filter().toLowerCase();
 		if (!filter){
+			console.log(this.markers());
 			for (var k in this.markers()){
 				this.markers()[k].visible = true;
 			}
