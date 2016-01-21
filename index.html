@@ -26,6 +26,7 @@
 		background-color: #cccccc;
 		text-align: center;
 		vertical-align: middle;
+		display: block;
 	}
 
 	.selected {
@@ -49,14 +50,16 @@
 </head>
 <body>
 	<div id="container">
-		<input type="text" placeholder="  Choose a place">
-		<table data-bind="with: placeViewModel">
+		<input type="text" placeholder="  Choose a place" data-bind="value: filter, valueUpdate: 'afterkeydown'">
+		<table>
 			<tr>
 				<th>Places</th>
 			</tr>
-			<tbody data-bind="foreach: placeArray">
-				<td class="listview" data-bind="text: name, css: {'selected': num === $parent.currentSelected()}, click: function() { $parent.selectItem($parent, $data);}"></td>
+			<tbody data-bind="template: {name: 'list', foreach: filteredItems}">
 			</tbody>
+			<script id="list" type="text/html">
+				<td class="listview" data-bind="text: name, css: {'selected': num === $parent.currentSelected()}, click: function() { $parent.selectItem($parent, $data);}"></td>
+			</script>
 		</table>
 		<div id="map"></div>		
 	</div>
@@ -123,16 +126,24 @@ function createMarker(place) {
 }
 
 var placeViewModel = {
-	// names = placeArray;
-	// placeclicked = ko.observable(0);
+	names: placeArray,
 	currentSelected: ko.observable(),
 	selectItem: function(that, ind){
 		that.currentSelected(ind.num);
-	}
-	// listViewClicked = function() {
-	// 	placeclicked(1);
-	// }
+	},
+	filter: ko.observable("")
 };
+
+placeViewModel.filteredItems = ko.dependentObservable(function() {
+		var filter = this.filter().toLowerCase();
+		if (!filter){
+			return this.names();
+		} else {
+			return ko.utils.arrayFilter(this.names(), function(item) {
+				return item.name.toLowerCase().indexOf(filter) !== -1;
+			});
+		}
+}, placeViewModel);
 
 ko.applyBindings(placeViewModel);
 	
