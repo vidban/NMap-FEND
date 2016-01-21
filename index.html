@@ -87,7 +87,7 @@ function initialize() {
 
 	infowindow = new google.maps.InfoWindow();
 
-	var service  = new google.maps.places.PlacesService(map);
+	service  = new google.maps.places.PlacesService(map);
 	service.nearbySearch({
 		location: loc,
 		radius: 1000,
@@ -107,20 +107,39 @@ function createMarker(place, i) {
 	var markerLetter = String.fromCharCode('A'.charCodeAt(0) + i);
    	var markerIcon = MARKER_PATH + markerLetter + '.png';
    	var markerLabel = place.name;
-
+   	
 	marker[i] = new google.maps.Marker({
 		map: map,
 	    position: place.geometry.location,
 	    animation: google.maps.Animation.DROP,
 	    icon: markerIcon,
 	    visible: false,
-	    name: markerLabel
+	    name: markerLabel,
+	    // placeResult: place
 	});
 
 	google.maps.event.addListener(marker[i], 'click', function() {
 		map.panTo(this.position);
-	    infowindow.setContent(markerLabel);
-	    infowindow.open(map, this);
+		service.getDetails({placeId: place.place_id}, function(place, status){
+			if (status !== google.maps.places.PlacesServiceStatus.OK) {
+				return;
+			}
+			var contentStr = '<div><strong>' + place.name + '</strong><br><p>' + place.formatted_address + '<br>' + place.formatted_phone_number + '</p></div>';
+			infowindow.setContent(contentStr);
+		});
+		infowindow.open(map, this);
+
+	    // add bounce feature to marker upon click
+	    if (this.getAnimation() !== null) {
+		    this.setAnimation(null);
+		} else {
+		    this.setAnimation(google.maps.Animation.BOUNCE);
+		}
+	});
+
+	//stops marker bounce on close of infowindow
+	google.maps.event.addListener(infowindow,'closeclick', function(){
+		marker[i].setAnimation(null);
 	});
 
 	// populate arrays with results of google placesearch
@@ -171,6 +190,6 @@ placeViewModel.selectedPin = ko.computed(function() {
 }, placeViewModel);
 
 ko.applyBindings(placeViewModel);
-	
+
 </script>
 </html>
