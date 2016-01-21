@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+	#container {
+		display: flex;
+		flex-wrap: wrap;
+	}
+	input {
+		width: 100vw;
+		height: 20px;
+	}
+	table {
+		margin-top: 5px;
+		border: 2px solid black;
+	}
+	th {
+		padding: 20px;
+		border: 1px solid black;
+	}
+
+	.listview {
+		height: 30px;
+		background-color: #cccccc;
+		text-align: center;
+		vertical-align: middle;
+	}
+
+	.selected {
+		background-color: #0d0d0d !important;
+		color: white;
+	}
+
+	.listview:hover {
+		background-color: #e6e6e6;
+	}
+
+
+	#map {
+		position: absolute;
+		margin-top: 5px;
+		width: 100vw;
+		height: 100vw;
+	}
+
+	</style>
+</head>
+<body>
+	<div id="container">
+		<input type="text" placeholder="  Choose a place">
+		<table data-bind="with: placeViewModel">
+			<tr>
+				<th>Places</th>
+			</tr>
+			<tbody data-bind="foreach: placeArray">
+				<td class="listview" data-bind="text: name, css: {'selected': num === $parent.currentSelected()}, click: function() { $parent.selectItem($parent, $data);}"></td>
+			</tbody>
+		</table>
+		<div id="map"></div>		
+	</div>
+	
+</body>
+<script src= "knockout-3.4.0.js"></script>
+<script src = "jquery-1.10.2.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBUxuLeByYwf76lHdvL2QUXTMj7VJwrTMM&libraries=places&callback=initialize"
+        async defer></script>
+<script>
+
+
+var map, infowindow;
+var placeArray = ko.observableArray();
+
+// create a map and setup markers for desired group
+
+function initialize() {
+	var loc = new google.maps.LatLng(37.383977, -122.081295);
+
+	map = new google.maps.Map(document.getElementById('map'), {
+		center: loc,
+		zoom: 14
+	});
+
+	infowindow = new google.maps.InfoWindow();
+
+	var service  = new google.maps.places.PlacesService(map);
+	service.nearbySearch({
+		location: loc,
+		radius: 1000,
+		types: ['school']
+	}, callback);
+}
+
+function callback(results, status) {
+	if (status === google.maps.places.PlacesServiceStatus.OK) {
+    	for (var i = 0; i < results.length; i++) {
+      	createMarker(results[i]);
+      	createPlaceNameArray(results[i], i);
+	    }
+	}	
+
+}
+
+// populate an array with results of google placesearch
+function createPlaceNameArray(place, i){
+   	placeArray.push({"num": i,"name": place.name});
+}
+
+
+function createMarker(place) {
+  var marker = new google.maps.Marker({
+    map: map,
+    position: place.geometry.location
+  });
+
+  google.maps.event.addListener(marker, 'click', function() {
+    infowindow.setContent(place.name);
+    infowindow.open(map, this);
+  });
+
+
+}
+
+var placeViewModel = {
+	// names = placeArray;
+	// placeclicked = ko.observable(0);
+	currentSelected: ko.observable(),
+	selectItem: function(that, ind){
+		that.currentSelected(ind.num);
+	}
+	// listViewClicked = function() {
+	// 	placeclicked(1);
+	// }
+};
+
+ko.applyBindings(placeViewModel);
+	
+</script>
+</html>
