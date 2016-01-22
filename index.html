@@ -267,6 +267,7 @@ function createMarker(place, i) {
 	    name: markerLabel,
 	});
 
+	// Load infowindow on marker click and toggle marker bounce
 	google.maps.event.addListener(marker[i], 'click', function() {
 		map.panTo(this.position);
 		service.getDetails({placeId: place.place_id}, function(place, status){
@@ -364,6 +365,7 @@ function loadYelp(pname,paddress){
 
 }
 
+// controls List menu transition on screens below 600 px width
 function toggleMenu(){
 	console.log('clicked');
 	if ($(".menu").hasClass("open")){
