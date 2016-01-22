@@ -27,7 +27,8 @@
 
 	.hamburger div {
 		background-color: #fff;
-*/		border-radius: 2px 2px 2px 2px;
+		border: 1px solid #eee;
+		border-radius: 2px 2px 2px 2px;
 		height: 2px;
 		width: 90%;
 		margin: auto;
@@ -127,6 +128,8 @@
         max-width: 200px;
     }
 
+/*  Responsiveness  */
+
     @media screen and (max-width: 600px){
     	header {
     		position: relative;
@@ -173,7 +176,7 @@
 	</header>
 	<div class="container">
 	<div class="menu closed">
-		<div class="srch"><img src="search-icon-md.png"><input type="text" placeholder="  Choose a place" data-bind="value: filter, valueUpdate: 'afterkeydown'"></div>
+		<div class="srch"><img src="search-icon-md.png"><input type="text" placeholder="  Choose a place from the list" data-bind="value: filter, valueUpdate: 'afterkeydown'"></div>
 		<table>
 			<tbody data-bind="template: {name: 'list', foreach: filteredItems}">
 			</tbody>
@@ -192,13 +195,10 @@
 </body>
 <script src= "knockout-3.4.0.js"></script>
 <script src = "jquery-1.10.2.js"></script>
-<script type="text/javascript" src="http://oauth.googlecode.com/svn/code/javascript/oauth.js"></script>
-<script type="text/javascript" src="http://oauth.googlecode.com/svn/code/javascript/sha1.js"></script>
 <script>
 
-
 var map = ko.observable();
-var infowindow;
+var infowindow, service;
 var placeArray = ko.observableArray();
 var MARKER_PATH = 'https://maps.gstatic.com/intl/en_us/mapfiles/marker_green';
 var marker = ko.observableArray();
@@ -217,17 +217,9 @@ function loadScript(){
 	}
 }
 
-window.onload = loadScript();
-
-
 // create a map and setup markers for desired establishment
-
 function initialize() {
-
-	if (typeof(google.maps) !== 'object'){
-		console.log("here");
-		$(".main").html("Error loading map! Please check your console");
-	}
+	"use strict";
 
 	var loc = new google.maps.LatLng(37.383977, -122.081295);
 
@@ -235,6 +227,11 @@ function initialize() {
 		center: loc,
 		zoom: 15
 	});
+
+	console.log(typeof(map));
+	if (typeof map !== 'object'){
+		alert("There was an error loading google maps!")
+	}
 
 	infowindow = new google.maps.InfoWindow({maxWidth: 200});
 
@@ -274,6 +271,7 @@ function createMarker(place, i) {
 		map.panTo(this.position);
 		service.getDetails({placeId: place.place_id}, function(place, status){
 			if (status !== google.maps.places.PlacesServiceStatus.OK) {
+				alert(status);
 				return;
 			}
 		loadYelp(place.name,place.formatted_address);
@@ -303,7 +301,6 @@ function loadYelp(pname,paddress){
 
   /*variables to check whether address on google maps matches yelp address */
 
-  // var ind = paddress.indexOf(',');
   var placeAddress = paddress.slice(0,3);
   /*Variable for OAuth Authentication. */
   var auth = {
@@ -351,6 +348,7 @@ function loadYelp(pname,paddress){
     'jsonpCallback' : 'cb',
     'success' : function(data) {
                     var result = data.businesses[0];
+                    console.log(result);
                     var raddress = result.location.address[0].slice(0,3);
                     var windowContent ='';
                     if (raddress==placeAddress){ 
@@ -427,5 +425,8 @@ placeViewModel.selectedPin = ko.computed(function() {
 
 ko.applyBindings(placeViewModel);
 
+window.onload = loadScript();
 </script>
+<script type="text/javascript" src="http://oauth.googlecode.com/svn/code/javascript/oauth.js"></script>
+<script type="text/javascript" src="http://oauth.googlecode.com/svn/code/javascript/sha1.js"></script>
 </html>
