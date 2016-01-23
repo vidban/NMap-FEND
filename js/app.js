@@ -21,10 +21,6 @@ function initialize() {
 		zoom: 15
 	});
 
-	if (typeof map !== 'object'){
-		alert("There was an error loading google maps!")
-	}
-
 	infowindow = new google.maps.InfoWindow({maxWidth: 200});
 
 	service  = new google.maps.places.PlacesService(map);

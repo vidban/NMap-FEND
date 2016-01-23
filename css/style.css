@@ -8,29 +8,33 @@ header {
 	background-color: #696969;
 	display: flex;
 }
-.hamburger {
-	border: 1px solid #374C77;
-    border-radius: 3px 3px 3px 3px;
-    background-color: green;
-    cursor: pointer;
-    padding: 3px 4px 3px;
-	display:none;
+.hamburger { 
+	left: 15px;
+	top: 30px;
 }
-.hamburger div {
-	background-color: #fff;
-	border: 1px solid #eee;
-	border-radius: 2px 2px 2px 2px;
-	height: 2px;
-	width: 90%;
-	margin: auto;
-	margin-bottom: 5px
+.hamburger, 
+.hamburger:before,
+.hamburger:after {
+	cursor: pointer;
+	border-radius: 1px;
+	height: 8px;
+	width: 50px;
+	background: white;
+	position: absolute;
+	display: block;
+	content: '';
+	display: none;
+
 }
-.hamburger div:first-child{
-	margin-top: 8px;
+.hamburger:before {
+  	top: -13px;
+}
+.hamburger:after {
+  	bottom: -13px; 
 }
 h1 {
 	padding: 0;
-	margin: 0;
+	margin: 0 0 0 100px;
 	width: 100%;
 	height: 100%;
 	text-align: center;
@@ -110,12 +114,10 @@ table {
    		position: relative;
    		height: 80px;
    	}
-	 .hamburger {
-	 	position: relative;
+	.hamburger, 
+	.hamburger:before,
+	.hamburger:after  {
 	 	display: block;
-	 	height: 50%;
-	 	width: 50px;
-	 	margin: 15px;
 	}
 	.closed {
 	 	margin-left: -300px;
