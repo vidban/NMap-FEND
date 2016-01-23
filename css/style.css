@@ -17,8 +17,8 @@ header {
 .hamburger:after {
 	cursor: pointer;
 	border-radius: 1px;
-	height: 8px;
-	width: 50px;
+	height: 5px;
+	width: 40px;
 	background: white;
 	position: absolute;
 	display: block;
@@ -34,9 +34,8 @@ header {
 }
 h1 {
 	padding: 0;
-	margin: 0 0 0 100px;
+	margin: 0 0 0 80px;
 	width: 100%;
-	height: 100%;
 	text-align: center;
 }
 .container {
@@ -109,7 +108,7 @@ table {
 
 /*  Responsiveness  */
 
-@media screen and (max-width: 600px){
+@media screen and (max-width: 600px) {
    	header {
    		position: relative;
    		height: 80px;
@@ -133,5 +132,12 @@ table {
 	}
 	#infowindow {
 		max-width: 300px
+	}
+}
+
+@media screen and (max-width: 321px) {
+	h1{
+		font-size: 100%;
+		margin-top:20px;
 	}
 }
