@@ -57,7 +57,15 @@ function createMarker(place, i) {
 
 	// Load infowindow on marker click and toggle marker bounce
 	google.maps.event.addListener(marker[i], 'click', function() {
+		var swidth = screen.width;
 		map.panTo(this.position);
+
+		// move map vertically down 40 pixels when on small screens to show infowindow properly
+		if (swidth <= 600){
+			console.log('here');
+			map.panBy(0,-200);
+		}
+
 		service.getDetails({placeId: place.place_id}, function(place, status){
 			if (status !== google.maps.places.PlacesServiceStatus.OK) {
 				alert(status);
