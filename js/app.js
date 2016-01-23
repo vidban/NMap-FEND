@@ -1,22 +1,14 @@
+// called if there is error loading google maps API
+function googleError(){
+	alert("There was an error loading Google Maps. Please check your console for details!");
+}
+
 var map = ko.observable();
 var infowindow, service;
 var placeArray = ko.observableArray();
 var MARKER_PATH = 'https://maps.gstatic.com/intl/en_us/mapfiles/marker_green';
 var marker = ko.observableArray();
 var currentMarker = '';
-
-// check whether user is online and load Google Maps otherwise alert
-function loadScript(){
-	if (!navigator.onLine){
-		alert("You are currently offline. Please check your connection");
-		return;
-	}else {
-		var script = document.createElement('script');
-		script.type = "text/javascript";
-		document.getElementsByTagName('body')[0].appendChild(script);
-		script.src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBUxuLeByYwf76lHdvL2QUXTMj7VJwrTMM&libraries=places&callback=initialize";
-	}
-}
 
 // create a map and setup markers for desired establishment
 function initialize() {
@@ -224,5 +216,3 @@ placeViewModel.selectedPin = ko.computed(function() {
 }, placeViewModel);
 
 ko.applyBindings(placeViewModel);
-
-window.onload = loadScript();
