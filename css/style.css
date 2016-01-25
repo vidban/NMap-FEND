@@ -1,17 +1,24 @@
-html, body {
+html,
+body {
 	margin: 0;
 	padding: 0;
 	height: 100%;
 	overflow: hidden;
 }
+
+
 header {
 	background-color: #696969;
 	display: flex;
 }
+
+
 .hamburger { 
 	left: 15px;
 	top: 30px;
 }
+
+
 .hamburger, 
 .hamburger:before,
 .hamburger:after {
@@ -26,24 +33,34 @@ header {
 	display: none;
 
 }
+
+
 .hamburger:before {
   	top: -13px;
 }
+
+
 .hamburger:after {
   	bottom: -13px; 
 }
+
+
 h1 {
 	padding: 0;
 	margin: 0 0 0 80px;
 	width: 100%;
 	text-align: center;
 }
+
+
 .container {
 	padding: 0;
 	margin-top: 5px;
 	display: flex;
 	flex-wrap: wrap;
 }
+
+
 /* Table and search menu on the left */
 .menu {
 	float: left;
@@ -55,25 +72,35 @@ h1 {
     -o-transition: 0.5s;
     transition: 0.5s;
 }
+
+
 .srch {
 	position: relative;
 	background-color: black;
 	margin: auto;
 }
+
+
 input {
 	background: #fcfcfc;
 	border-radius: 5px;
 	width: calc(100% - 24px);
 	height: 20px;
 }
+
+
 .srch img {
 	width: 20px;
 	height: 22px;
 	vertical-align: middle;
 }
+
+
 table {
 	height: 100vw;
 }
+
+
 .listview {
 	height: 40px;
 	text-align: center;
@@ -81,16 +108,20 @@ table {
 	display: block;
 	cursor: pointer;
 }
+
+
 .selected {
 	background-color: #0d0d0d !important;
 	color: white;
 }
+
+
 .listview:hover {
 	background-color: #b3b3b3;
 }
 
-/*   Map */
 
+/*   Map */
 .main {
 	width: calc(100% - 300px);
 	float: right;
@@ -101,39 +132,54 @@ table {
     -o-transition: 0.5s;
     transition: 0.5s;
 }
+
+
 .mapcanvas{
 	width: 100%;
 	height: 100vh;
 }
 
-/*  Responsiveness  */
 
+/*  Responsiveness  */
 @media screen and (max-width: 600px) {
    	header {
    		position: relative;
    		height: 80px;
    	}
+
+
 	.hamburger, 
 	.hamburger:before,
 	.hamburger:after  {
 	 	display: block;
 	}
+
+
 	.closed {
 	 	margin-left: -300px;
 	}
+
+
 	.open{
 		margin-left: 0;
 	}
+
+
 	.showmap {
 	 	width: 100%;
 	}
+
+
  	.hidemap {
 		width: calc(100% - 300px);
 	}
+
+
 	#infowindow {
 		max-width: 300px
 	}
 }
+
 
 @media screen and (max-width: 321px) {
 	h1{

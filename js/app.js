@@ -71,11 +71,11 @@ function createMarker(place, i) {
 				alert(status);
 				return;
 			}
-		loadYelp(place.name,place.formatted_address);
+			loadYelp(place.name,place.formatted_address);
 		});
 		infowindow.open(map, this);
 
-	    // add bounce feature to marker upon click and stop earlier marker from bouncing
+		// add bounce feature to marker upon click and stop earlier marker from bouncing
 		if (currentMarker!=='') currentMarker.setAnimation(null);
 		currentMarker= this;
 		this.setAnimation(google.maps.Animation.BOUNCE);
@@ -94,70 +94,71 @@ function createMarker(place, i) {
 
 
 function loadYelp(pname,paddress){
-  var placeName = pname;
+  	var placeName = pname;
 
-  /*variables to check whether address on google maps matches yelp address */
+	/*variables to check whether address on google maps matches yelp address */
+	var placeAddress = paddress.slice(0,3);
 
-  var placeAddress = paddress.slice(0,3);
-  /*Variable for OAuth Authentication. */
-  var auth = {
-      consumerKey: "rb0_f_10ZvwVLb-ouicNzQ",
-      consumerSecret: "rppLm7P8oempuQYXa4AiS9ij26Y",
-      accessToken: "VZp-IvJfl6hGPyU93vX-Il-oVIR3U72e",
-      accessTokenSecret: "YpfDA6iodkeNOIaAlympNA-ntHU",
-      serviceProvider : {signatureMethod : "HMAC-SHA1"}
-      };
+	/*Variable for OAuth Authentication. */
+	var auth = {
+	    consumerKey: "rb0_f_10ZvwVLb-ouicNzQ",
+	    consumerSecret: "rppLm7P8oempuQYXa4AiS9ij26Y",
+	    accessToken: "VZp-IvJfl6hGPyU93vX-Il-oVIR3U72e",
+	    accessTokenSecret: "YpfDA6iodkeNOIaAlympNA-ntHU",
+	    serviceProvider : {signatureMethod : "HMAC-SHA1"}
+	};
 
-  var accessor = {
-      consumerSecret : auth.consumerSecret,
-      tokenSecret : auth.accessTokenSecret
-      };
-  /*Terms to search */
-  var terms = placeName.replace(' ','+');
-  var near = 'Mountain+View';
-  var parameters = [];
+	var accessor = {
+	    consumerSecret : auth.consumerSecret,
+	    tokenSecret : auth.accessTokenSecret
+	};
+	/*Terms to search */
+	var terms = placeName.replace(' ','+');
+	var near = 'Mountain+View';
+	var parameters = [];
 
-  parameters.push(['term', terms]);
-  parameters.push(['location', near]);
-  parameters.push(['limit', 1]);
-  parameters.push(['callback', 'cb']);
-  parameters.push(['oauth_consumer_key', auth.consumerKey]);
-  parameters.push(['oauth_consumer_secret', auth.consumerSecret]);
-  parameters.push(['oauth_token', auth.accessToken]);
-  parameters.push(['oauth_signature_method', 'HMAC-SHA1']);
+	parameters.push(['term', terms]);
+	parameters.push(['location', near]);
+	parameters.push(['limit', 1]);
+	parameters.push(['callback', 'cb']);
+	parameters.push(['oauth_consumer_key', auth.consumerKey]);
+	parameters.push(['oauth_consumer_secret', auth.consumerSecret]);
+	parameters.push(['oauth_token', auth.accessToken]);
+	parameters.push(['oauth_signature_method', 'HMAC-SHA1']);
 
-  var message = {
-      'action' : 'http://api.yelp.com/v2/search',
-      'method' : 'GET',
-      'parameters' : parameters
-      };
+	var message = {
+	    'action' : 'http://api.yelp.com/v2/search',
+	    'method' : 'GET',
+	    'parameters' : parameters
+	};
 
-  OAuth.setTimestampAndNonce(message);
-  OAuth.SignatureMethod.sign(message, accessor);
+	OAuth.setTimestampAndNonce(message);
+	OAuth.SignatureMethod.sign(message, accessor);
 
-  var parameterMap = OAuth.getParameterMap(message.parameters);
+	var parameterMap = OAuth.getParameterMap(message.parameters);
 
-  $.ajax({
-    'cache': true,
-    'url' : message.action,
-    'data' : parameterMap,
-    'dataType' : 'jsonp',
-    'jsonpCallback' : 'cb',
-    'success' : function(data) {
-                    var result = data.businesses[0];
-                    var raddress = result.location.address[0].slice(0,3);
-                    var windowContent ='';
-                    if (raddress==placeAddress){ 
-	                    windowContent += '<div id="infowindow"><img src="img/yelp_powered_btn_red.png"><br><img id= "bimage" src= "' + result.image_url + '"><br><strong>' + result.name + '</strong><div>' + result.location.display_address.toString() + '</div><div>' + result.display_phone + '</div><br><img src="' + result.rating_img_url_small + '" alt="rating"> (' + result.rating + ')<br><div>Number of Reviews:' + result.review_count + '</div><br><div>' + result.snippet_text + '</div><a href= "' + result.url + '">...Read More</div>';}
-	                else {windowContent = 'No Yelp Reviews Found for this address!';}
-                    infowindow.setContent(windowContent);
-                },
-    'error' : function(XMLHttpRequest, textStats, errorThrown) {
-      alert('Error: Problem connecting to Yelp.');
-    }
+	$.ajax({
+		'cache': true,
+		'url' : message.action,
+		'data' : parameterMap,
+	    'dataType' : 'jsonp',
+	    // 'jsonpCallback' : 'cb',
+	    'success' : function(data) {
+	                    var result = data.businesses[0];
+	                    var raddress = result.location.address[0].slice(0,3);
+	                    var windowContent ='';
+	                    if (raddress==placeAddress){ 
+		                    windowContent += '<div id="infowindow"><img src="img/yelp_powered_btn_red.png"><br><img id= "bimage" src= "' + result.image_url + '"><br><strong>' + result.name + '</strong><div>' + result.location.display_address.toString() + '</div><div>' + result.display_phone + '</div><br><img src="' + result.rating_img_url_small + '" alt="rating"> (' + result.rating + ')<br><div>Number of Reviews:' + result.review_count + '</div><br><div>' + result.snippet_text + '</div><a href= "' + result.url + '">...Read More</div>';
+		                }else {
+		                	windowContent = 'No Yelp Reviews Found for this address!';
+		                }
+	                    infowindow.setContent(windowContent);
+	                },
+	    'error' : function(XMLHttpRequest, textStats, errorThrown) {
+	      alert('Error: Problem connecting to Yelp.');
+	    }
 
-  });
-
+	});
 }
 
 // controls List menu transition on screens below 600 px width
@@ -187,21 +188,23 @@ var placeViewModel = {
 
 // filters list and markers based on search
 placeViewModel.filteredItems = ko.computed(function() {
-		var filter = this.filter().toLowerCase();
-		if (!filter){
-			for (var k in this.markers()){
-				this.markers()[k].visible = true;
-			}
-			return this.names();
-		} else {
-			ko.utils.arrayFilter(this.markers(), function(pin) {
-				var matches = pin.name.toLowerCase().indexOf(filter) >= 0;
-				pin.setVisible(matches);
-			});
-			return ko.utils.arrayFilter(this.names(), function(item) {
-				return item.name.toLowerCase().indexOf(filter) !== -1;
-			});
+	var filter = this.filter().toLowerCase();
+	if (!filter){
+		for (var k in this.markers()){
+			this.markers()[k].visible = true;
 		}
+		return this.names();
+	} else {
+		infowindow.close();  		//close infowindow if filter location does not match
+
+		ko.utils.arrayFilter(this.markers(), function(pin) {
+			var matches = pin.name.toLowerCase().indexOf(filter) >= 0;
+			pin.setVisible(matches);
+		});
+		return ko.utils.arrayFilter(this.names(), function(item) {
+			return item.name.toLowerCase().indexOf(filter) !== -1;
+		});
+	}
 }, placeViewModel);
 
 // triggers click for associated marker on menu click
@@ -212,9 +215,11 @@ placeViewModel.selectedPin = ko.computed(function() {
 	}
 
 	var filteredPin = this.filteredPin();
-	for (var k in this.markers()){
-		if (this.markers()[k].name === filteredPin){
-			google.maps.event.trigger(this.markers()[k], 'click');
+	if (filteredPin){
+		for (var k in this.markers()){
+			if (this.markers()[k].name === filteredPin){
+				google.maps.event.trigger(this.markers()[k], 'click');
+			}
 		}
 	}
 }, placeViewModel);

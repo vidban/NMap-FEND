@@ -3,7 +3,7 @@
 Click [here](http://vidban.github.io/NMap-FEND/) to see it in action
 
 ## Instructions for use:
-Fork the repository and clone it to your computer. Use it as is or link it to your page.
+Fork the repository and clone it to your computer. Double click "index.html" to open the app in your browser. 
 
 ## Features:
  This is a single page application featuring a map centered at MountainView. It includes a list of Restaurants in that city.
