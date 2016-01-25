@@ -9,24 +9,73 @@ var placeArray = ko.observableArray();
 var MARKER_PATH = 'https://maps.gstatic.com/intl/en_us/mapfiles/marker_green';
 var marker = ko.observableArray();
 var currentMarker = '';
+var autocomplete;
+var countryRestrict = {'country':'us'};
+var cityName;
+
 
 // create a map and setup markers for desired establishment
 function initialize() {
 	"use strict";
 
-	var loc = new google.maps.LatLng(37.383977, -122.081295);
-
+	// set initial location to whole of continental U.S.
+	var loc = new google.maps.LatLng(37.1, -95.7);
 	map = new google.maps.Map(document.getElementById('map'), {
 		center: loc,
-		zoom: 15
-	});
+		zoom: 3,
+		mayTypeControl: false,
+		zoomControl: false,
+		streetViewControl:false
+	}); 
 
+	//gets autocomplete input for city
+	getCityInput();
+}
+
+// Capture inputs for city
+function getCityInput(){
+	// Create the autocomplete object and associate it with the UI input control.
+  	// Restrict the search to the default country, and to place type "cities".
+  	autocomplete = new google.maps.places.Autocomplete((document.getElementById('ecity')), {
+													        types: ['(cities)'],
+													        componentRestrictions: countryRestrict
+												    	});
+	service  = new google.maps.places.PlacesService(map);
+
+	autocomplete.addListener('place_changed', onPlaceChanged);
+}
+
+// zoom map to entered city and change heading of page accordingly
+function onPlaceChanged(){
+
+	var place= autocomplete.getPlace();
+	cityName = place.name;
+
+	//Empty previous list and markers
+	placeArray([]);
+	marker([]);
+
+	// set heading based on place 
+	$('#heading').html("Restaurants around " + place.name);
+
+	// if place found zoom to place else ask user to enter a valid city
+	if (place.geometry) {
+		map.panTo(place.geometry.location);
+    	map.setZoom(17);
+    	search();
+	} else {
+		alert("Enter a valid city");
+	}
+}
+
+
+function search(){
 	infowindow = new google.maps.InfoWindow({maxWidth: 200});
 
-	service  = new google.maps.places.PlacesService(map);
 	service.nearbySearch({
-		location: loc,
-		radius: 1000,
+		// location: loc,
+		// radius: 1000,
+		bounds: map.getBounds(),
 		types: ['restaurant']
 	}, callback);
 }
@@ -58,11 +107,11 @@ function createMarker(place, i) {
 	// Load infowindow on marker click and toggle marker bounce
 	google.maps.event.addListener(marker[i], 'click', function() {
 		var swidth = screen.width;
+		map.panBy(0,-200);
 		map.panTo(this.position);
 
 		// move map vertically down 40 pixels when on small screens to show infowindow properly
 		if (swidth <= 600){
-			console.log('here');
 			map.panBy(0,-200);
 		}
 
@@ -71,7 +120,7 @@ function createMarker(place, i) {
 				alert(status);
 				return;
 			}
-			loadYelp(place.name,place.formatted_address);
+			loadYelp(place.name,place.formatted_address,cityName);
 		});
 		infowindow.open(map, this);
 
@@ -84,6 +133,7 @@ function createMarker(place, i) {
 	//stops marker bounce on close of infowindow
 	google.maps.event.addListener(infowindow,'closeclick', function(){
 		marker[i].setAnimation(null);
+		$('.listview').removeClass("selected");
 	});
 
 	// populate arrays with results of google placesearch
@@ -93,7 +143,7 @@ function createMarker(place, i) {
 }
 
 
-function loadYelp(pname,paddress){
+function loadYelp(pname,paddress,cityName){
   	var placeName = pname;
 
 	/*variables to check whether address on google maps matches yelp address */
@@ -114,11 +164,10 @@ function loadYelp(pname,paddress){
 	};
 	/*Terms to search */
 	var terms = placeName.replace(' ','+');
-	var near = 'Mountain+View';
 	var parameters = [];
 
 	parameters.push(['term', terms]);
-	parameters.push(['location', near]);
+	parameters.push(['location', cityName]);
 	parameters.push(['limit', 1]);
 	parameters.push(['callback', 'cb']);
 	parameters.push(['oauth_consumer_key', auth.consumerKey]);
@@ -144,13 +193,21 @@ function loadYelp(pname,paddress){
 	    'dataType' : 'jsonp',
 	    // 'jsonpCallback' : 'cb',
 	    'success' : function(data) {
+	    				// to check thoroughly through all given addresses for that location:
+	    				var resultlen = data.businesses[0].location.address.length;
+	    				var found = false;
 	                    var result = data.businesses[0];
-	                    var raddress = result.location.address[0].slice(0,3);
 	                    var windowContent ='';
-	                    if (raddress==placeAddress){ 
-		                    windowContent += '<div id="infowindow"><img src="img/yelp_powered_btn_red.png"><br><img id= "bimage" src= "' + result.image_url + '"><br><strong>' + result.name + '</strong><div>' + result.location.display_address.toString() + '</div><div>' + result.display_phone + '</div><br><img src="' + result.rating_img_url_small + '" alt="rating"> (' + result.rating + ')<br><div>Number of Reviews:' + result.review_count + '</div><br><div>' + result.snippet_text + '</div><a href= "' + result.url + '">...Read More</div>';
-		                }else {
-		                	windowContent = 'No Yelp Reviews Found for this address!';
+	                    // loop over addresses to check for matching Google maps api returned address
+	                	for (var n=0; n<resultlen; n++){
+	                		raddress = result.location.address[n].slice(0,3);
+	                			if (raddress==placeAddress){ 
+		                   			windowContent += '<div id="infowindow"><img src="img/yelp_powered_btn_red.png"><br><img id= "bimage" src= "' + result.image_url + '"><br><strong>' + result.name + '</strong><div>' + result.location.display_address.toString() + '</div><div>' + result.display_phone + '</div><br><img src="' + result.rating_img_url_small + '" alt="rating"> (' + result.rating + ')<br><div>Number of Reviews:' + result.review_count + '</div><br><div>' + result.snippet_text + '</div><a href= "' + result.url + '">...Read More</div>';
+		                   			found = true;
+		                		}
+		                }
+		                if (!found) {
+		                	windowContent = 'Cannot find Yelp Review for this location! Maybe it is known by a different name to Yelpers than to Googlers! For eg. Cold Stone Creamery in Stanford, CA is reviewed on Yelp as "Tin Pot Creamery"';
 		                }
 	                    infowindow.setContent(windowContent);
 	                },
@@ -172,7 +229,6 @@ function toggleMenu(){
 		$(".main").removeClass("showmap").addClass("hidemap");
 	}
 }
-
 
 var placeViewModel = {
 	names: placeArray,

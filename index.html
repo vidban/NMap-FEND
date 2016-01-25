@@ -11,11 +11,15 @@
 <body>
 	<header>
 		<div class="hamburger" onclick="toggleMenu()"></div>
-		<h1>Restaurants around Mountain View, CA</h1>
+		<h1 id ="heading"></h1>
 	</header>
 	<div class="container">
 	<div class="menu closed">
-		<div class="srch"><img src="img/search-icon-md.png" alt="search icon"><input type="text" placeholder="  Choose a place from the list" data-bind="value: filter, valueUpdate: 'afterkeydown'"></div>
+		<div class="srch">
+			<input type="text" id="ecity" name="city" placeholder="City within U.S.A to search in">
+			<img src="img/search-icon-md.png" alt="search icon">
+			<input type="text" placeholder="  Choose a place from the list" data-bind="value: filter, valueUpdate: 'afterkeydown'">
+		</div>
 		<table>
 			<tbody data-bind="template: {name: 'list', foreach: filteredItems}">
 			</tbody>

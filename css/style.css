@@ -84,8 +84,13 @@ h1 {
 input {
 	background: #fcfcfc;
 	border-radius: 5px;
-	width: calc(100% - 24px);
+	width: calc(100% - 28px);
 	height: 20px;
+}
+
+
+input:focus {
+	border-color: #4d90fe;
 }
 
 
