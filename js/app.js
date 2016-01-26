@@ -49,14 +49,13 @@ function getCityInput(){
 function onPlaceChanged(){
 
 	var place= autocomplete.getPlace();
-	cityName = place.name;
+	console.log(place);
+	// cityName = place.name;
+	cityName = place.formatted_address;
 
 	//Empty previous list and markers
 	placeArray([]);
 	marker([]);
-
-	//hide citysearch input field
-	$('.csearch').toggleClass("hidden");
 
 	// set heading based on place 
 	$('#heading').html("Restaurants around " + place.name);
@@ -64,11 +63,17 @@ function onPlaceChanged(){
 	// if place found zoom to place else ask user to enter a valid city
 	if (place.geometry) {
 		map.panTo(place.geometry.location);
-    	map.setZoom(17);
+    	map.setZoom(16);
+    	map.panBy(0, -200);
+
+    	//hide citysearch input field
+		$('.csearch').toggleClass("hidden");
+
     	search();
+
 	} else {
 		alert("Enter a valid city");
-		toggleCitySearch();
+		getCityInput();
 	}
 }
 
@@ -94,11 +99,12 @@ function callback(results, status) {
 	}	
 }
 
+//create markers
 function createMarker(place, i) {
 	var markerLetter = String.fromCharCode('A'.charCodeAt(0) + i);
    	var markerIcon = MARKER_PATH + markerLetter + '.png';
    	var markerLabel = place.name;
-   	
+
 	marker[i] = new google.maps.Marker({
 		map: map,
 	    position: place.geometry.location,
@@ -168,10 +174,12 @@ function loadYelp(pname,paddress,cityName){
 	};
 	/*Terms to search */
 	var terms = placeName.replace(' ','+');
+	var cntry = 'US';
 	var parameters = [];
 
 	parameters.push(['term', terms]);
 	parameters.push(['location', cityName]);
+	parameters.push(['cc', cntry]);
 	parameters.push(['limit', 1]);
 	parameters.push(['callback', 'cb']);
 	parameters.push(['oauth_consumer_key', auth.consumerKey]);
@@ -195,8 +203,8 @@ function loadYelp(pname,paddress,cityName){
 		'url' : message.action,
 		'data' : parameterMap,
 	    'dataType' : 'jsonp',
-	    // 'jsonpCallback' : 'cb',
 	    'success' : function(data) {
+	    				console.log(data);
 	    				// to check thoroughly through all given addresses for that location:
 	    				var resultlen = data.businesses[0].location.address.length;
 	    				var found = false;
@@ -211,7 +219,7 @@ function loadYelp(pname,paddress,cityName){
 		                		}
 		                }
 		                if (!found) {
-		                	windowContent = 'Cannot find Yelp Review for this location! Maybe it is known by a different name to Yelpers than to Googlers! For eg. Cold Stone Creamery in Stanford, CA is reviewed on Yelp as "Tin Pot Creamery"';
+		                	windowContent = 'Cannot find Yelp Review for this location! It could be reviewed under a different name!';
 		                }
 	                    infowindow.setContent(windowContent);
 	                },
