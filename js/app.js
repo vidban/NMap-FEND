@@ -64,7 +64,6 @@ function onPlaceChanged(){
 	if (place.geometry) {
 		map.panTo(place.geometry.location);
     	map.setZoom(16);
-    	map.panBy(0, -200);
 
     	//hide citysearch input field
 		$('.csearch').toggleClass("hidden");
