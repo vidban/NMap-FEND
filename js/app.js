@@ -55,6 +55,9 @@ function onPlaceChanged(){
 	placeArray([]);
 	marker([]);
 
+	//hide citysearch input field
+	$('.csearch').toggleClass("hidden");
+
 	// set heading based on place 
 	$('#heading').html("Restaurants around " + place.name);
 
@@ -65,6 +68,7 @@ function onPlaceChanged(){
     	search();
 	} else {
 		alert("Enter a valid city");
+		toggleCitySearch();
 	}
 }
 
@@ -228,6 +232,19 @@ function toggleMenu(){
 		$(".menu").removeClass("closed").addClass("open");
 		$(".main").removeClass("showmap").addClass("hidemap");
 	}
+}
+
+// shows/hides city search input field
+function toggleCitySearch(){
+	$('.csearch').toggleClass('hidden');
+	$('.csearch input').val(" ");
+	if (screen.width < 600) {
+		toggleMenu();
+	}
+	placeArray([]);
+	$('#heading').html("");
+	initialize();
+	
 }
 
 var placeViewModel = {

@@ -16,9 +16,10 @@
 	<div class="container">
 	<div class="menu closed">
 		<div class="srch">
-			<input type="text" id="ecity" name="city" placeholder="City within U.S.A to search in">
+			<button class="cbutton" onclick="toggleCitySearch()">Change City</button>
+			<br>
 			<img src="img/search-icon-md.png" alt="search icon">
-			<input type="text" placeholder="  Choose a place from the list" data-bind="value: filter, valueUpdate: 'afterkeydown'">
+			<input type="text" class="finput" placeholder="  Choose a place from the list" data-bind="value: filter, valueUpdate: 'afterkeydown'">
 		</div>
 		<table>
 			<tbody data-bind="template: {name: 'list', foreach: filteredItems}">
@@ -32,6 +33,10 @@
 		</table>
 	</div>
 	<div  class="main showmap">
+		<div class="csearch">
+			<label for="citysearch">Enter a U.S. city to begin your search</label>
+			<input type="text" id="ecity" name="city" placeholder="Name of city">
+		</div>
 		<div class="mapcanvas" id="map"></div>	
 	</div>	
 	</div>
