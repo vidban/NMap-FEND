@@ -49,7 +49,6 @@ function getCityInput(){
 function onPlaceChanged(){
 
 	var place= autocomplete.getPlace();
-	console.log(place);
 	// cityName = place.name;
 	cityName = place.formatted_address;
 
@@ -63,13 +62,16 @@ function onPlaceChanged(){
 	// if place found zoom to place else ask user to enter a valid city
 	if (place.geometry) {
 		map.panTo(place.geometry.location);
-    	map.setZoom(16);
+    	map.setZoom(15);
 
     	//hide citysearch input field
 		$('.csearch').toggleClass("hidden");
 
     	search();
-
+    	
+    	if (screen.width > 600){
+    		toggleMenu();
+    	}
 	} else {
 		alert("Enter a valid city");
 		getCityInput();
@@ -203,7 +205,6 @@ function loadYelp(pname,paddress,cityName){
 		'data' : parameterMap,
 	    'dataType' : 'jsonp',
 	    'success' : function(data) {
-	    				console.log(data);
 	    				// to check thoroughly through all given addresses for that location:
 	    				var resultlen = data.businesses[0].location.address.length;
 	    				var found = false;
@@ -218,7 +219,7 @@ function loadYelp(pname,paddress,cityName){
 		                		}
 		                }
 		                if (!found) {
-		                	windowContent = 'Cannot find Yelp Review for this location! It could be reviewed under a different name!';
+		                	windowContent = 'Cannot find Yelp Review for this location! It could be reviewed under a different name or it might have CLOSED!';
 		                }
 	                    infowindow.setContent(windowContent);
 	                },
@@ -245,9 +246,7 @@ function toggleMenu(){
 function toggleCitySearch(){
 	$('.csearch').toggleClass('hidden');
 	$('.csearch input').val(" ");
-	if (screen.width < 600) {
-		toggleMenu();
-	}
+	toggleMenu();
 	placeArray([]);
 	$('#heading').html("");
 	initialize();
