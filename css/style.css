@@ -9,6 +9,8 @@ body {
 
 header {
 	background-color: #696969;
+	max-width: 100%;
+
 	display: flex;
 }
 
@@ -31,7 +33,6 @@ header {
 	display: block;
 	content: '';
 	display: none;
-
 }
 
 
@@ -66,6 +67,7 @@ h1 {
 	float: left;
 	width: 300px;
 	background-color: #696969;
+	overflow: auto;
 	-webkit-transition: 0.5s;
     -moz-transition: 0.5s;
     -ms-transition: 0.5s;
@@ -110,12 +112,6 @@ input:focus {
 	border-radius: 2px;
 	height: 30px;
 	font: 120% bold Georgia, serif;
-
-}
-
-
-.hidden {
-	display: none;
 }
 
 
@@ -156,7 +152,8 @@ table {
 
 /*   Map */
 .main {
-	width: calc(100% - 300px);
+	max-width: 100%;
+	height: 100vh;
 	float: right;
 
 	-webkit-transition: 0.5s;
@@ -167,14 +164,10 @@ table {
 }
 
 
-.mapcanvas {
+.mapcanvas,
+.showmap {
 	width: 100%;
 	height: 100vh;
-}
-
-
-.showmap {
- 	width: 100%;
 }
 
 
@@ -188,11 +181,16 @@ table {
 	margin-top: 10px;
 	margin-left: 10px;
 	background-color: white;
+	border: 1px solid blue;
 	opacity: 0.7;
 	padding: 20px;
 	z-index: 1;
 	width: 50%;
+	-ms-transform: translate(50px,100px); /* IE 9 */
+    -webkit-transform: translate(50px,100px); /* Safari */
+    transform: translate(50px,100px); /* Standard syntax */
 }
+
 
 .csearch label,
 .csearch input {
@@ -203,10 +201,14 @@ table {
 }
 
 
+.hidden {
+	display: none;
+}
+
+
 /*  Responsiveness  */
 @media screen and (max-width: 600px) {
    	header {
-   		position: relative;
    		height: 80px;
    	}
 
@@ -218,16 +220,6 @@ table {
 	}
 
 
-/*	.closed {
-	 	margin-left: -300px;
-	}
-
-
-	.open{
-		margin-left: 0;
-	}*/
-
-
 	.cbutton {
 		position: relative;
 		margin: 2px 0 5px 10px;
@@ -235,16 +227,6 @@ table {
 		margin-bottom: 5px;
 	}
 
-
-/*	.showmap {
-	 	width: 100%;
-	}
-
-
- 	.hidemap {
-		width: calc(100% - 300px);
-	}
-*/
 
 	#infowindow {
 		max-width: 300px

@@ -49,7 +49,11 @@ function getCityInput(){
 function onPlaceChanged(){
 
 	var place= autocomplete.getPlace();
-	// cityName = place.name;
+
+	// var to get latitude and longitude of city to map using google maps API
+	loc= new google.maps.LatLng(place.geometry.location.lat(), place.geometry.location.lng());
+
+	// variable to store city,state and country for yelp matching
 	cityName = place.formatted_address;
 
 	//Empty previous list and markers
@@ -62,14 +66,20 @@ function onPlaceChanged(){
 	// if place found zoom to place else ask user to enter a valid city
 	if (place.geometry) {
 		map.panTo(place.geometry.location);
-    	map.setZoom(15);
+		if (screen.width < 600) {
+			map.setZoom(12);
+		} else {
+    		map.setZoom(15);
+    	}
 
     	//hide citysearch input field
 		$('.csearch').toggleClass("hidden");
 
+		//perform location search
     	search();
     	
-    	if (screen.width > 600){
+    	var check = $('.menu').hasClass('closed');
+    	if (screen.width > 600 && check) {
     		toggleMenu();
     	}
 	} else {
@@ -83,8 +93,6 @@ function search(){
 	infowindow = new google.maps.InfoWindow({maxWidth: 200});
 
 	service.nearbySearch({
-		// location: loc,
-		// radius: 1000,
 		bounds: map.getBounds(),
 		types: ['restaurant']
 	}, callback);
@@ -118,13 +126,8 @@ function createMarker(place, i) {
 	// Load infowindow on marker click and toggle marker bounce
 	google.maps.event.addListener(marker[i], 'click', function() {
 		var swidth = screen.width;
-		map.panBy(0,-200);
 		map.panTo(this.position);
-
-		// move map vertically down 40 pixels when on small screens to show infowindow properly
-		if (swidth <= 600){
-			map.panBy(0,-200);
-		}
+		map.panBy(0,-200);
 
 		service.getDetails({placeId: place.place_id}, function(place, status){
 			if (status !== google.maps.places.PlacesServiceStatus.OK) {
@@ -141,18 +144,32 @@ function createMarker(place, i) {
 		this.setAnimation(google.maps.Animation.BOUNCE);
 	});
 
+
 	//stops marker bounce on close of infowindow
 	google.maps.event.addListener(infowindow,'closeclick', function(){
 		marker[i].setAnimation(null);
 		$('.listview').removeClass("selected");
+		map.panTo(place.geometry.location);
+		if (screen.width < 600) {
+			map.setZoom(12);
+		} else {
+    		map.setZoom(15);
+    	}
 	});
 
 	// populate arrays with results of google placesearch
    	placeArray.push({"num": i,"name": place.name, "iconimage":markerIcon, "placeResult":place}); 
+
+   	// push newly created marker into array
    	marker.push(marker[i]);	
 
+   	// attach remove marker listener to marker when change city button clicked
+   	var button = document.querySelector("button");
+   	button.addEventListener("click", function(){
+   		marker[i].setMap(null);
+   		marker([]);
+   	})
 }
-
 
 function loadYelp(pname,paddress,cityName){
   	var placeName = pname;
@@ -181,7 +198,7 @@ function loadYelp(pname,paddress,cityName){
 	parameters.push(['term', terms]);
 	parameters.push(['location', cityName]);
 	parameters.push(['cc', cntry]);
-	parameters.push(['limit', 1]);
+	parameters.push(['limit', 3]);
 	parameters.push(['callback', 'cb']);
 	parameters.push(['oauth_consumer_key', auth.consumerKey]);
 	parameters.push(['oauth_consumer_secret', auth.consumerSecret]);
@@ -205,19 +222,24 @@ function loadYelp(pname,paddress,cityName){
 		'data' : parameterMap,
 	    'dataType' : 'jsonp',
 	    'success' : function(data) {
-	    				// to check thoroughly through all given addresses for that location:
-	    				var resultlen = data.businesses[0].location.address.length;
-	    				var found = false;
-	                    var result = data.businesses[0];
-	                    var windowContent ='';
-	                    // loop over addresses to check for matching Google maps api returned address
-	                	for (var n=0; n<resultlen; n++){
-	                		raddress = result.location.address[n].slice(0,3);
-	                			if (raddress==placeAddress){ 
-		                   			windowContent += '<div id="infowindow"><img src="img/yelp_powered_btn_red.png"><br><img id= "bimage" src= "' + result.image_url + '"><br><strong>' + result.name + '</strong><div>' + result.location.display_address.toString() + '</div><div>' + result.display_phone + '</div><br><img src="' + result.rating_img_url_small + '" alt="rating"> (' + result.rating + ')<br><div>Number of Reviews:' + result.review_count + '</div><br><div>' + result.snippet_text + '</div><a href= "' + result.url + '">...Read More</div>';
-		                   			found = true;
-		                		}
-		                }
+			    		var found = false;
+	    				// Loop over businesses if more than one with same name found
+	    				if ((data.businesses.length >= 1) && !found) {
+	    					for (var x in data.businesses){
+			    				// to check thoroughly through all given addresses for that location:
+			    				var resultlen = data.businesses[x].location.address.length;
+			                    var result = data.businesses[x];
+			                    // loop over addresses to check for matching Google maps api returned address
+			                	for (var n=0; n<resultlen; n++){
+			                		raddress = result.location.address[n].slice(0,3);
+			                			if (raddress==placeAddress){ 
+			                    			var windowContent ='';
+				                   			windowContent += '<div id="infowindow"><img src="img/yelp_powered_btn_red.png"><br><img id= "bimage" src= "' + result.image_url + '"><br><strong>' + result.name + '</strong><div>' + result.location.display_address.toString() + '</div><div>' + result.display_phone + '</div><br><img src="' + result.rating_img_url_small + '" alt="rating"> (' + result.rating + ')<br><div>Number of Reviews:' + result.review_count + '</div><br><div>' + result.snippet_text + '</div><a href= "' + result.url + '">...Read More</div>';
+				                   			found = true;
+				                		}
+				                }
+	    					}
+	    				}
 		                if (!found) {
 		                	windowContent = 'Cannot find Yelp Review for this location! It could be reviewed under a different name or it might have CLOSED!';
 		                }
@@ -242,15 +264,17 @@ function toggleMenu(){
 	}
 }
 
-// shows/hides city search input field
+//add functionality to Change City button
 function toggleCitySearch(){
-	$('.csearch').toggleClass('hidden');
-	$('.csearch input').val(" ");
-	toggleMenu();
 	placeArray([]);
-	$('#heading').html("");
-	initialize();
-	
+	map.setCenter(new google.maps.LatLng(37.1, -95.7));
+	map.setZoom(3);
+	$('.csearch').toggleClass('hidden');
+	$('.csearch input').val(" ").focus();
+	infowindow.close();
+	if (screen.width < 600) {
+		toggleMenu();
+	}
 }
 
 var placeViewModel = {
