@@ -168,7 +168,7 @@ function createMarker(place, i) {
    	button.addEventListener("click", function(){
    		marker[i].setMap(null);
    		marker([]);
-   	})
+   	});
 }
 
 function loadYelp(pname,paddress,cityName){
@@ -233,7 +233,7 @@ function loadYelp(pname,paddress,cityName){
 			                	for (var n=0; n<resultlen; n++){
 			                		raddress = result.location.address[n].slice(0,3);
 			                			if (raddress==placeAddress){ 
-			                    			var windowContent ='';
+			                    			windowContent ='';
 				                   			windowContent += '<div id="infowindow"><img src="img/yelp_powered_btn_red.png"><br><img id= "bimage" src= "' + result.image_url + '"><br><strong>' + result.name + '</strong><div>' + result.location.display_address.toString() + '</div><div>' + result.display_phone + '</div><br><img src="' + result.rating_img_url_small + '" alt="rating"> (' + result.rating + ')<br><div>Number of Reviews:' + result.review_count + '</div><br><div>' + result.snippet_text + '</div><a href= "' + result.url + '">...Read More</div>';
 				                   			found = true;
 				                		}
