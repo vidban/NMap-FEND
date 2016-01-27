@@ -14,6 +14,7 @@ Click [here](http://vidban.github.io/NMap-FEND/) to see it in action
 - Click on markers to see the restaurant closest to your location and read what others have to say about it.
 - Or browse through the list to find a restaurant you like and find its location and reviews.
 - Or if you don't feel like going through the whole list and know your restaurant, enter the name in the search bar and have the list and markers filtered for your ease.
+- If you want to do a search in a different city, press the **"Change City"** button to start all over again
 
 
 ## Skills learned:
@@ -37,7 +38,7 @@ Click [here](http://vidban.github.io/NMap-FEND/) to see it in action
 
 ## Future Modifications
 - Add choice for establishments.
-- Add other API's like Foursquare and such to provide additional details about a restaurant.
+- Add images of establishment to provide additional details about a restaurant.
 
 ## Resources Used
 - stackoverflow.com
