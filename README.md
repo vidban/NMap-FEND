@@ -1,10 +1,9 @@
+Click [here](http://vidban.github.io/NMap-FEND/) to see it in action
+
 # Project- 5  Neighborhood Map- Udacity
 
 ## Overview
 This single page application is a search for available Restaurants in a given city. It provides a list of restaurants in a given city with a marker marking its location on the map. And clicking on a marker, shows a review for the that location as provided by Yelp. To read more about what other people have to say, there is a link in the review window to lead you to the Yelp Review Page for that restaurant. There is also a search bar to narrow down that list to easily choose a restaurant  by name and read its reviews on yelp to help you decide if its a good choice for eating out!
-
-
-Click [here](http://vidban.github.io/NMap-FEND/) to see it in action
 
 
 ## Instructions for use:
