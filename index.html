@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="Neighborhood Map ">
+    <meta name="author" content="Vidhu Bansal ">
+	<title>Eating Out</title>
+	<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+	<header>
+		<div class="hamburger" onclick="toggleMenu()"></div>
+		<h1 id="heading"></h1>
+	</header>
+	<div class="container">
+	<div class="menu closed">
+		<div class="srch">
+			<button class="cbutton" onclick="toggleCitySearch()">Change City</button>
+			<br>
+			<img src="img/search-icon-md.png" alt="search icon">
+			<input type="text" class="finput" placeholder="  Choose a place from the list" data-bind="value: filter, valueUpdate: 'afterkeydown'">
+		</div>
+		<table>
+			<tbody data-bind="template: {name: 'list', foreach: filteredItems}">
+			</tbody>
+			<script id="list" type="text/html">
+				<tr class="listview" data-bind="css: {'selected': num === $parent.currentSelected()}, click: function() { $parent.selectItem($parent, $data); $parent.filteredPin();}">
+					<td><img data-bind="attr: {src: iconimage}"></td>
+					<td data-bind="text: name"></td>
+				</tr>
+			</script>
+		</table>
+	</div>
+	<div  class="main showmap">
+		<div class="csearch">
+			<label for="ecity">Enter a U.S. city to begin your search</label>
+			<input type="text" id="ecity" name="city" placeholder="Name of city" autofocus>
+		</div>
+		<div class="mapcanvas" id="map"></div>	
+	</div>	
+	</div>
+<script src="js/lib/knockout-3.4.0.js"></script>
+<script src="js/lib/jquery-1.10.2.js"></script>
+<script src="js/app.js"></script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBUxuLeByYwf76lHdvL2QUXTMj7VJwrTMM&libraries=places&callback=initialize" onerror="googleError()"></script>
+<script src="http://oauth.googlecode.com/svn/code/javascript/oauth.js"></script>
+<script src="http://oauth.googlecode.com/svn/code/javascript/sha1.js"></script>
+</body>
+</html>
