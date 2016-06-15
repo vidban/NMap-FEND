@@ -1,4 +1,3 @@
-Click [here](http://vidban.github.io/NMap-FEND/) to see it in action
 
 # Project- 5  Neighborhood Map- Udacity
 
